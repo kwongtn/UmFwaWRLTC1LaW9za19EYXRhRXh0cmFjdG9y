@@ -1,0 +1,19 @@
+{
+  "name": "rapidkl-route-extractor",
+  "version": "0.0.1",
+  "description": "Extracting RapidKL bus routes information from the kiosk website.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kwongtn/UmFwaWRLTC1LaW9za19EYXRhRXh0cmFjdG9y.git"
+  },
+  "author": "KwongTN",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/kwongtn/UmFwaWRLTC1LaW9za19EYXRhRXh0cmFjdG9y/issues"
+  },
+  "homepage": "https://github.com/kwongtn/UmFwaWRLTC1LaW9za19EYXRhRXh0cmFjdG9y#readme"
+}
