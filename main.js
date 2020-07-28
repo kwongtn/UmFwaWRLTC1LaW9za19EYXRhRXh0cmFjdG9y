@@ -22,12 +22,12 @@ getWebContent.getRouteList().then((list) => {
 
         try {
             fs.writeFileSync(vars.routeListOutputPath, JSON.stringify(list, null, 2), "utf-8");
+            utils.logger("File write complete.");
         } catch (err) {
             utils.logger("Error writing to " + vars.routeListOutputPath);
             utils.logger(err);
         }
 
-        utils.logger("File write complete.");
 
     } else {
         utils.logger("Output disabled for getRouteList.");
