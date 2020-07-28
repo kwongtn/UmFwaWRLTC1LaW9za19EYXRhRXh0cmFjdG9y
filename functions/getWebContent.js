@@ -39,3 +39,45 @@ module.exports.getRouteList = () => {
 
 }
 
+/**
+ * Retrieves KML file and returns it.
+ * @param {string} routeName Route Name to get KML File.
+ * @return {Promise<string>}
+ */
+module.exports.getKML = (routeName) => {
+    utils.logger("Retrieving KML File for route " + routeName);
+
+    return new Promise((resolve, reject) => {
+        var options = {
+            'method': 'GET',
+            'hostname': 'myrapidbus.prasarana.com.my',
+            'path': '/assets/map/'.concat(routeName).concat(".kml"),
+            'maxRedirects': 20
+        };
+
+        var req = https.request(options, function (res) {
+            var chunks = [];
+
+            res.on("data", function (chunk) {
+                chunks.push(chunk);
+            });
+
+            res.on("end", function (chunk) {
+                var body = Buffer.concat(chunks);
+                resolve(body.toString());
+            });
+
+            res.on("error", function (error) {
+                console.error(error);
+                reject(error);
+            });
+        });
+
+        req.end();
+
+    });
+}
+
+module.exports.getStopList = (routeKey) => {
+
+}
