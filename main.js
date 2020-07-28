@@ -8,8 +8,8 @@ const utils = require("./functions/utils.js");
 const vars = require("./variables.js");
 
 // Script to get route list and write into file.
-getWebContent.getRouteList().then((list) => {
-    list = JSON.parse(list);
+getWebContent.getRouteList().then(async (list) => {
+    list = await JSON.parse(list);
 
     // Outputs the results if debug mode is enabled.
     vars.debugMode ? console.log(list) : null;
