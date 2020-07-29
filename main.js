@@ -3,9 +3,13 @@ const fs = require("fs");
 // Import all required functions
 const getWebContent = require("./functions/getWebContent.js");
 const utils = require("./functions/utils.js");
+const paramsProcessor = require("./functions/paramsProcessor.js");
 
 // Import all required variables
 const vars = require("./variables.js");
+
+const params = paramsProcessor.parse(process.argv);
+console.log(params);
 
 // Script to get route list and write into file.
 getWebContent.getRouteList().then(async (list) => {
@@ -38,51 +42,56 @@ getWebContent.getRouteList().then(async (list) => {
 }).catch((err) => {
     utils.logger("ERROR: " + err);
 }).then((routeList) => {
-    var multiplier = -1;
+    utils.logger("===Start KML File Processes===");
 
-    routeList.forEach((route, index) => {
-        // Counter for timeout
-        var timer = index % vars.KML_LimitPerLoad;
-        if (!timer) {
-            multiplier++;
-        }
-        setTimeout(() => {
-            var myPath = vars.KMLOutputPath.concat(route.val.replace(/\s/, "_")).concat(".kml");
-            getWebContent.getKML(route.val.replace(/\s/, "%20")).then((data) => {
+    if (params.getKML) {
 
-                if (vars.KMLOutput) {
-                    utils.logger("KML File download for route " + route.val + " suceeded. Saving it to \'" + myPath);
+        var multiplier = -1;
 
-                    try {
-                        fs.writeFileSync(myPath, data, "utf-8");
-                        utils.logger("File write complete for " + myPath);
+        routeList.forEach((route, index) => {
+            // Counter for timeout
+            var timer = index % vars.KML_LimitPerLoad;
+            if (!timer) {
+                multiplier++;
+            }
+            setTimeout(() => {
+                var myPath = vars.KMLOutputPath.concat(route.val.replace(/\s/, "_")).concat(".kml");
+                getWebContent.getKML(route.val.replace(/\s/, "%20")).then((data) => {
+
+                    if (vars.KMLOutput) {
+                        utils.logger("KML File download for route " + route.val + " suceeded. Saving it to \'" + myPath);
+
+                        try {
+                            fs.writeFileSync(myPath, data, "utf-8");
+                            utils.logger("File write complete for " + myPath);
 
 
-                    } catch (err) {
-                        utils.logger("Error writing to " + myPath);
-                        utils.logger(err);
+                        } catch (err) {
+                            utils.logger("Error writing to " + myPath);
+                            utils.logger(err);
+                        }
+
+
+                    } else {
+                        utils.logger("KML File download for route " + route.val + " suceeded. Not saving it down.");
+
                     }
 
+                    // Sleeping prompt
+                    if (!timer) {
+                        utils.logger("SLEEP: Start sleeping for " + (vars.KML_TimeoutMultiplier / 1000) + " seconds while waiting for jobs to complete.");
+                    }
 
-                } else {
-                    utils.logger("KML File download for route " + route.val + " suceeded. Not saving it down.");
-
-                }
-
-                // Sleeping prompt
-                if (!timer) {
-                    utils.logger("SLEEP: Start sleeping for " + (vars.KML_TimeoutMultiplier / 1000) + " seconds while waiting for jobs to complete.");
-                }
-
-            }).catch((err) => {
-                utils.logger("ERROR: " + err);
-            });
+                }).catch((err) => {
+                    utils.logger("ERROR: " + err);
+                });
 
 
-        }, multiplier * vars.KML_TimeoutMultiplier);
+            }, multiplier * vars.KML_TimeoutMultiplier);
 
 
-    });
+        });
+    }
 
     return routeList;
 
