@@ -95,7 +95,58 @@ getWebContent.getRouteList().then(async (list) => {
 
     return routeList;
 
-}).then(routeList => {
-    
-});
+}).then((routeList) => {
+    if(params.getStopLocations){
+        utils.logger("===Start Stop List Processes===");
+        
+        var multiplier = -1;
+
+        routeList.forEach((route, index) => {
+            // Counter for timeout
+            var timer = index % vars.Stop_LimitPerLoad;
+            if (!timer) {
+                multiplier++;
+            }
+            setTimeout(() => {
+                var myPath = vars.StopOutputPath.concat(route.val.replace(/\s/, "_")).concat(".json");
+                getWebContent.getStopList(route.key).then((data) => {
+
+                    if (vars.StopOutput) {
+                        utils.logger("Stops download for route " + route.val + " suceeded. Saving it to \'" + myPath);
+
+                        try {
+                            fs.writeFileSync(myPath, JSON.stringify(data, null, 2), "utf-8");
+                            utils.logger("File write complete for " + myPath);
+
+
+                        } catch (err) {
+                            utils.logger("Error writing to " + myPath);
+                            utils.logger(err);
+                        }
+
+
+                    } else {
+                        utils.logger("Stop list download for route " + route.val + " suceeded. Not saving it down.");
+
+                    }
+
+                    // Sleeping prompt
+                    if (!timer) {
+                        utils.logger("SLEEP: Start sleeping for " + (vars.Stop_TimeoutMultiplier / 1000) + " seconds while waiting for jobs to complete.");
+                    }
+
+                }).catch((err) => {
+                    utils.logger("ERROR: " + err);
+                });
+
+
+            }, multiplier * vars.Stop_TimeoutMultiplier);
+
+
+        });
+    }
+
+    return routeList;
+    }
+);
 

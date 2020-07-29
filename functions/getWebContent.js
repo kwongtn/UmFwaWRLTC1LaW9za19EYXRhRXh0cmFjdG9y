@@ -78,6 +78,44 @@ module.exports.getKML = (routeName) => {
     });
 }
 
+/**
+ * Retrieves the route stop list and returns it.
+ * @param {int} routeKey Key value for route.
+ * @return {Promise<JSON>}
+ */
 module.exports.getStopList = (routeKey) => {
+    return new Promise((resolve, reject) => {
+        var options = {
+            'method': 'GET',
+            'hostname': 'myrapidbus.prasarana.com.my',
+            'path': '/kiosk?route=' + routeKey,
+            'maxRedirects': 20
+        };
 
+        var req = https.request(options, function (res) {
+            var chunks = [];
+
+            res.on("data", function (chunk) {
+                chunks.push(chunk);
+            });
+
+            res.on("end", function (chunk) {
+                var body = Buffer.concat(chunks);
+
+                // Process the response into JSON Format
+                body = /var bstp.*;/m.exec(body).toString('utf-8');
+                body = body.replace(/var bstp .*= /, "").replace(/;$/, "");
+
+                resolve(JSON.parse(body), null, 2);
+            });
+
+            res.on("error", function (error) {
+                console.error(error);
+                reject(error);
+            });
+        });
+
+        req.end();
+
+    });
 }
